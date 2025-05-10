@@ -1,6 +1,6 @@
 from fastapi import FastAPI, UploadFile, Form, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, FileResponse
+from fastapi.responses import HTMLResponse,JSONResponse, FileResponse
 from pdf_reader import extract_pages_from_pdf
 from summarizer import summarize_entire_document, summarize_page
 import tempfile

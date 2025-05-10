@@ -76,7 +76,7 @@ def summarize_page(text, language="id", mode="page"):
         ]
     }
     headers = {
-        "Authorization": API_KEY,
+        "Authorization": "{API_KEY}",
         "Content-Type": "application/json"
     }
     try:

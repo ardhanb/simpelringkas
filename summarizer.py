@@ -10,9 +10,6 @@ MAX_TOKENS_PER_CHUNK = 5000
 TPM_LIMIT = 6000
 TOKEN_WINDOW = deque()
 
-if not API_KEY:
-    raise ValueError("❌ API key GROQ tidak ditemukan di environment!")
-
 def estimate_tokens(text):
     return int(len(text.split()) * 1.3)
 
@@ -79,7 +76,7 @@ def summarize_page(text, language="id", mode="page"):
         ]
     }
     headers = {
-        "Authorization": f"Bearer {API_KEY}",
+        "Authorization": "Bearer {API_KEY}",
         "Content-Type": "application/json"
     }
     try:

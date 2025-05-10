@@ -1,8 +1,9 @@
 import httpx
 import time
 from collections import deque
+import os
 
-API_KEY = "Bearer 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"  # Ganti dengan API asli kamu
+API_KEY = os.getenv("GROQ_API_KEY")  # Ganti dengan API asli kamu
 MODEL = "gemma2-9b-it"
 MAX_TOKENS_PER_CHUNK = 5000
 

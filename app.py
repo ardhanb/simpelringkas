@@ -22,8 +22,9 @@ app.add_middleware(
 # ✅ Serve landing page
 @app.get("/", response_class=HTMLResponse)
 def landing_page():
-    with open("about-us.html", "r", encoding="utf-8") as f:
-        return f.read()
+    return "<h1>✅ Aplikasi berhasil jalan!</h1>"
+    # with open("about-us.html", "r", encoding="utf-8") as f:
+        #return f.read()
 
 # ✅ Serve tool page
 @app.get("/app", response_class=HTMLResponse)

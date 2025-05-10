@@ -18,6 +18,18 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
+# ✅ Serve landing page
+@app.get("/", response_class=HTMLResponse)
+def landing_page():
+    with open("about-us.html", "r", encoding="utf-8") as f:
+        return f.read()
+
+# ✅ Serve tool page
+@app.get("/app", response_class=HTMLResponse)
+def tool_page():
+    with open("index.html", "r", encoding="utf-8") as f:
+        return f.read()
+
 # Variabel global
 current_progress = {"page": 0, "total": 0, "status": "idle"}
 TEMP_SUMMARY_PATH = "summary.txt"

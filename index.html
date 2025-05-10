@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SimpelRingkas - Ringkasan Otomatis PDF</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0 auto;
+      max-width: 600px;
+      padding: 20px;
+    }
+    .box {
+      margin-bottom: 20px;
+    }
+    textarea {
+      width: 100%;
+      height: 200px;
+      margin-top: 10px;
+    }
+    button {
+      padding: 10px 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #388e3c;
+    }
+    #downloadBtn {
+      display: none;
+      margin-top: 10px;
+    }
+    footer {
+      font-size: 12px;
+      color: #555;
+      margin-top: 30px;
+    }
+  </style>
+  <!-- ✅ KODE ADSENSE -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
+    crossorigin="anonymous"></script>
+</head>
+<body>
+  <h1>🧠 SimpelRingkas</h1>
+  <p><strong>Upload PDF kamu</strong> dan dapatkan ringkasan otomatis dalam hitungan detik.</p>
+
+  <div class="box">
+    <form id="uploadForm" enctype="multipart/form-data">
+      <label for="file">Pilih file PDF (maks. 300 kB):</label><br />
+      <input type="file" name="pdf_file" accept=".pdf" required /><br /><br />
+
+      <label for="language">Pilih bahasa ringkasan:</label><br />
+      <select name="language" required>
+        <option value="id">Bahasa Indonesia</option>
+        <option value="en">English</option>
+      </select><br /><br />
+
+      <label for="mode">Mode Ringkasan:</label><br />
+      <select name="mode" required>
+        <option value="full">📚 Ringkas Seluruh Dokumen</option>
+        <option value="page">📄 Ringkas per Halaman</option>
+      </select><br /><br />
+
+
+      <button type="submit">Ringkas Sekarang</button>
+    </form>
+  </div>
+
+  <!-- ✅ Slot Iklan Dipindahkan ke Sini -->
+  <div style="margin: 20px 0;">
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-XXXXXXXXXXXXXXX" <!-- Ganti dengan ID kamu 
+         data-ad-slot="1234567890"              <!-- Ganti dengan slot ID.
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+
+  <div class="box">
+    <h3>📋 Hasil Ringkasan:</h3>
+    <textarea id="result" placeholder="Ringkasan akan muncul di sini..." readonly></textarea>
+    <button id="downloadBtn">📥 Unduh Ringkasan (.txt)</button>
+  </div>
+
+  <footer>
+    <p>AI tidak dimaksudkan untuk menggantikan proses belajar, tetapi untuk menemani Anda memahami lebih cepat dan lebih dalam.</p>
+    <p><em>Saran dan kritik? hubungi kami di instagram @simpelringkas.ai</em></p>
+  </footer>
+
+  <script>
+    const form = document.getElementById("uploadForm");
+    const resultBox = document.getElementById("result");
+    const downloadBtn = document.getElementById("downloadBtn");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      
+      const fileInput = form.querySelector('input[name="pdf_file"]');
+      const file = fileInput.files[0];
+      const mode = form.querySelector('select[name="mode"]').value;
+
+      if (mode === "full" && file.size > 300 * 1024) {
+        alert("❌ Ukuran file melebihi 300 KB. Harap kompres atau gunakan mode 'Per Halaman'.");
+        return;
+      }
+
+      const formData = new FormData(form);
+      resultBox.value = "⏳ Sedang memproses...";
+      downloadBtn.style.display = "none";
+
+      try {
+        const res = await fetch("http://127.0.0.1:8000/api/summarize", {
+          method: "POST",
+          body: formData
+        });
+
+        const data = await res.json();
+        resultBox.value = data.summary || "⚠️ Gagal mendapatkan ringkasan.";
+
+        if (data.summary) {
+          downloadBtn.style.display = "inline-block";
+        }
+      } catch (err) {
+        resultBox.value = "❌ Terjadi kesalahan saat menghubungi server.";
+      }
+    });
+
+    downloadBtn.addEventListener("click", () => {
+      window.open("http://127.0.0.1:8000/api/download", "_blank");
+    });
+  </script>
+</body>
+</html>

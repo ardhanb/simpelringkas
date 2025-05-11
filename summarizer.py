@@ -10,7 +10,7 @@ MAX_TOKENS_PER_CHUNK = 5000
 TPM_LIMIT = 6000
 TOKEN_WINDOW = deque()
 
-print(f"GROQ API Key: {API_KEY}")
+# print(f"GROQ API Key: {API_KEY}")
 
 def estimate_tokens(text):
     return int(len(text.split()) * 1.3)
@@ -81,6 +81,7 @@ def summarize_page(text, language="id", mode="page"):
         "Authorization": f"Bearer {API_KEY}",
         "Content-Type": "application/json"
     }
+
     try:
         timeout = httpx.Timeout(connect=15.0, read=60.0, write=30.0, pool=5.0)
         response = httpx.post(
@@ -89,6 +90,10 @@ def summarize_page(text, language="id", mode="page"):
             headers=headers,
             timeout=timeout
         )
+
+        print("Groq API Response:", response.status_code)
+        print("Groq Response Content:", response.text)
+
         if response.status_code != 200:
             return f"[Gagal ringkas] Status: {response.status_code}\nDetail: {response.text}"
         data = response.json()

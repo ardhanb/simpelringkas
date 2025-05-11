@@ -10,7 +10,7 @@ MAX_TOKENS_PER_CHUNK = 5000
 TPM_LIMIT = 6000
 TOKEN_WINDOW = deque()
 
-print("GROQ API Key found:", bool(API_KEY))
+print("GROQ API Key found:", {API_KEY})
 
 def estimate_tokens(text):
     return int(len(text.split()) * 1.3)

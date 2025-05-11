@@ -91,14 +91,12 @@ def summarize_page(text, language="id", mode="page"):
             timeout=timeout
         )
 
-        print("Groq API Response:", response.status_code)
-        print("Groq Response Content:", response.text)
-
         if response.status_code != 200:
             return f"[Gagal ringkas] Status: {response.status_code}\nDetail: {response.text}"
         data = response.json()
         return data["choices"][0]["message"]["content"]
     except Exception as e:
+        print("🔥 [Groq Exception]:", str(e))
         return f"[Groq Error]: {str(e)}"
 
 def summarize_entire_document(full_text, language="id", mode="full"):

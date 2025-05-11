@@ -116,7 +116,7 @@
       downloadBtn.style.display = "none";
 
       try {
-        const res = await fetch("http://127.0.0.1:8000/api/summarize", {
+        const res = await fetch("http://127.0.0.1:8080/api/summarize", {
           method: "POST",
           body: formData
         });

@@ -33,7 +33,7 @@ def wait_for_token_availability(estimated_tokens):
         wait_for_token_availability(estimated_tokens)
     TOKEN_WINDOW.append((time.time(), estimated_tokens))
 
-def generate_prompt(text, language="id", summary_type="narrative", tone="simple"):
+def generate_prompt(text, language="id", mode="page"):
     if language == "id":
         return f"""
 Kamu adalah asisten akademik yang terlatih dalam merangkum isi utama dari jurnal ilmiah dan artikel penelitian. Berikut adalah isi dokumen akademik.

@@ -30,7 +30,7 @@ def wait_for_token_availability(estimated_tokens):
         wait_for_token_availability(estimated_tokens)
     TOKEN_WINDOW.append((time.time(), estimated_tokens))
 
-def generate_prompt(text, language="id"):
+def generate_prompt(text, language="id", mode="page"):
     if language == "id":
         return f"""
 Kamu adalah asisten akademik yang terlatih dalam merangkum isi utama dari jurnal ilmiah dan artikel penelitian. Berikut adalah isi dokumen akademik.
@@ -62,8 +62,8 @@ Use academic tone and professional language.
 {text}
 """
 
-def summarize_page(text, language="id", retry_count=3):
-    prompt = generate_prompt(text, language)
+def summarize_page(text, language="id", mode="page", retry_count=3):
+    prompt = generate_prompt(text, language, mode)
     payload = {
         "model": MODEL,
         "messages": [
@@ -91,7 +91,6 @@ def summarize_page(text, language="id", retry_count=3):
                 data = response.json()
                 return data["choices"][0]["message"]["content"]
 
-            # Jika token terlalu banyak
             if response.status_code == 400 and "context_length_exceeded" in response.text:
                 print("⚠️ Context terlalu panjang! Pecah ulang chunk...")
                 sub_chunks = split_text_by_token(text, max_tokens=MAX_TOKENS_PER_CHUNK // 2)
@@ -131,13 +130,14 @@ def summarize_entire_document(full_text, language="id", mode="full"):
     if len(intermediate_summaries) == 1:
         return intermediate_summaries[0]
 
+    # Gabungkan semua hasil chunk menjadi satu teks
     combined_summary = "\n\n".join(intermediate_summaries)
-    final_prompt = f"""
+
+    # Gunakan prompt akademik yang sama untuk merangkum gabungan
+    final_summary_input = f"""
 Berikut adalah ringkasan per bagian dari dokumen:
 
 {combined_summary}
-
-Gabungkan semua ringkasan ini menjadi satu ringkasan akhir yang menyeluruh, rapi, dan terstruktur.
 """
-    wait_for_token_availability(estimate_tokens(final_prompt) + 1000)
-    return summarize_page(final_prompt, language, "full")
+    wait_for_token_availability(estimate_tokens(final_summary_input) + 1000)
+    return summarize_page(final_summary_input, language, mode="page")  # Gunakan prompt akademik

@@ -41,7 +41,7 @@ Ringkasan harus mencakup:
 - Tujuan penulisan
 - Argumen atau temuan penting
 - Kesimpulan atau implikasi
-- Bahan diskusi untuk pengembangan topik
+- Bahan diskusi untuk pengembangan topik berikutnya
 
 Gunakan bahasa akademik yang padat namun tetap jelas.
 
@@ -58,7 +58,7 @@ Include:
 - Key arguments or findings
 - Discussion
 - Final conclusion or implication
-- Discussion materials for topic development
+- Discussion materials for topic development in the future
 
 Use academic tone and professional language.
 

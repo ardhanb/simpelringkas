@@ -3,14 +3,11 @@ import time
 from collections import deque
 import os
 
-API_KEY = os.getenv("GROQ_API_KEY")  # Ganti dengan API asli kamu
+API_KEY = os.getenv("GROQ_API_KEY")
 MODEL = "gemma2-9b-it"
 MAX_TOKENS_PER_CHUNK = 5000
-
 TPM_LIMIT = 6000
 TOKEN_WINDOW = deque()
-
-# print(f"GROQ API Key: {API_KEY}")
 
 def estimate_tokens(text):
     return int(len(text.split()) * 1.3)
@@ -48,8 +45,6 @@ Ringkasan harus mencakup:
 Gunakan bahasa akademik yang padat namun tetap jelas.
 
 {text}
-
-{text}
 """
     else:
         return f"""
@@ -64,11 +59,10 @@ Include:
 
 Use academic tone and professional language.
 
-
 {text}
 """
 
-def summarize_page(text, language="id", mode="page"):
+def summarize_page(text, language="id", mode="page", retry_count=3):
     prompt = generate_prompt(text, language, mode)
     payload = {
         "model": MODEL,
@@ -82,22 +76,39 @@ def summarize_page(text, language="id", mode="page"):
         "Content-Type": "application/json"
     }
 
-    try:
-        timeout = httpx.Timeout(connect=15.0, read=60.0, write=30.0, pool=5.0)
-        response = httpx.post(
-            "https://api.groq.com/openai/v1/chat/completions",
-            json=payload,
-            headers=headers,
-            timeout=timeout
-        )
+    for attempt in range(1, retry_count + 1):
+        try:
+            print(f"📡 Kirim ke Groq (percobaan ke-{attempt})")
+            timeout = httpx.Timeout(connect=15.0, read=60.0, write=30.0, pool=5.0)
+            response = httpx.post(
+                "https://api.groq.com/openai/v1/chat/completions",
+                json=payload,
+                headers=headers,
+                timeout=timeout
+            )
 
-        if response.status_code != 200:
-            return f"[Gagal ringkas] Status: {response.status_code}\nDetail: {response.text}"
-        data = response.json()
-        return data["choices"][0]["message"]["content"]
-    except Exception as e:
-        print("🔥 [Groq Exception]:", str(e))
-        return f"[Groq Error]: {str(e)}"
+            if response.status_code == 200:
+                data = response.json()
+                return data["choices"][0]["message"]["content"]
+
+            # Jika token terlalu banyak
+            if response.status_code == 400 and "context_length_exceeded" in response.text:
+                print("⚠️ Context terlalu panjang! Pecah ulang chunk...")
+                sub_chunks = split_text_by_token(text, max_tokens=MAX_TOKENS_PER_CHUNK // 2)
+                sub_summaries = []
+                for sub in sub_chunks:
+                    sub_summary = summarize_page(sub, language, mode)
+                    sub_summaries.append(sub_summary)
+                return "\n\n".join(sub_summaries)
+
+            print(f"⚠️ Error {response.status_code} → {response.text}")
+            time.sleep(1.5)
+
+        except Exception as e:
+            print(f"🔥 Exception ke-{attempt}:", str(e))
+            time.sleep(1.5)
+
+    return f"[Groq Error]: Gagal setelah {retry_count} percobaan."
 
 def summarize_entire_document(full_text, language="id", mode="full"):
     chunks = split_text_by_token(full_text, MAX_TOKENS_PER_CHUNK)
